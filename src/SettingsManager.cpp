@@ -18,6 +18,7 @@ bool SettingsManager::loadAppSettings() {
     Preferences preferences;
     if (preferences.begin("appSettings", true)) {
         appSettings.mqttServer = preferences.getString("mqttServer", String(""));
+        appSettings.mqttPort = preferences.getString("mqttPort", String(""));
         appSettings.mqttUsername = preferences.getString("mqttUsername", String(""));
         appSettings.mqttPassword = preferences.getString("mqttPassword", String(""));
         appSettings.mqttRootTopic = preferences.getString("mqttRootTopic", String("fingerprintDoorbell"));
@@ -45,6 +46,7 @@ void SettingsManager::saveAppSettings() {
     Preferences preferences;
     preferences.begin("appSettings", false); 
     preferences.putString("mqttServer", appSettings.mqttServer);
+    preferences.putString("mqttPort", appSettings.mqttPort);
     preferences.putString("mqttUsername", appSettings.mqttUsername);
     preferences.putString("mqttPassword", appSettings.mqttPassword);
     preferences.putString("mqttRootTopic", appSettings.mqttRootTopic);

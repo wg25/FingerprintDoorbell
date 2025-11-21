@@ -128,6 +128,8 @@ String processor(const String& var){
       return "********"; // for security reasons the wifi password will not left the device once configured
   } else if (var == "MQTT_SERVER") {
     return settingsManager.getAppSettings().mqttServer;
+  } else if (var == "MQTT_PORT") {
+    return settingsManager.getAppSettings().mqttPort;
   } else if (var == "MQTT_USERNAME") {
     return settingsManager.getAppSettings().mqttUsername;
   } else if (var == "MQTT_PASSWORD") {
@@ -352,6 +354,7 @@ void startWebserver(){
         Serial.println("Save settings");
         AppSettings settings = settingsManager.getAppSettings();
         settings.mqttServer = request->arg("mqtt_server");
+        settings.mqttPort = request->arg("mqtt_port");
         settings.mqttUsername = request->arg("mqtt_username");
         settings.mqttPassword = request->arg("mqtt_password");
         settings.mqttRootTopic = request->arg("mqtt_rootTopic");
@@ -655,11 +658,13 @@ void setup()
       } else {
         delay(5000);
         IPAddress mqttServerIp;
+        int port = settingsManager.getAppSettings().mqttPort.toInt();
         if (WiFi.hostByName(settingsManager.getAppSettings().mqttServer.c_str(), mqttServerIp))
         {
           mqttConfigValid = true;
           Serial.println("IP used for MQTT server: " + mqttServerIp.toString());
-          mqttClient.setServer(mqttServerIp , 1883);
+          Serial.println("Port used for MQTT server: " + settingsManager.getAppSettings().mqttPort);
+          mqttClient.setServer(mqttServerIp , port);
           mqttClient.setCallback(mqttCallback);
           connectMqttClient();
         }

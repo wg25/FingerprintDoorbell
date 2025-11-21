@@ -12,10 +12,11 @@ struct WifiSettings {
 
 struct AppSettings {
     String mqttServer = "";
+    String mqttPort = "";
     String mqttUsername = "";
     String mqttPassword = "";
     String mqttRootTopic = "fingerprintDoorbell";
-    String ntpServer = "pool.ntp.org";
+    String ntpServer = "ptbtime1.ptb.de";
     String sensorPin = "00000000";
     String sensorPairingCode = "";
     bool   sensorPairingValid = false;
