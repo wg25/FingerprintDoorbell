@@ -6,7 +6,6 @@
 #include <DNSServer.h>
 #include <time.h>
 #include <ESPAsyncWebServer.h>
-#include <AsyncElegantOTA.h>
 #include <SPIFFS.h>
 #include <PubSubClient.h>
 #include "FingerprintManager.h"
@@ -435,10 +434,7 @@ void startWebserver(){
     request->send(SPIFFS, "/bootstrap.min.css", "text/css");
   });
 
-
-  // Enable Over-the-air updates at http://<IPAddress>/update
-  AsyncElegantOTA.begin(&webServer);
-  
+ 
   // Start server
   webServer.begin();
 
