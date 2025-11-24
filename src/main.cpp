@@ -9,6 +9,8 @@
 #include <ElegantOTA.h>
 #include <SPIFFS.h>
 #include <PubSubClient.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 #include "FingerprintManager.h"
 #include "SettingsManager.h"
 #include "global.h"
@@ -25,7 +27,7 @@ const char* WifiConfigPassword = "12345678"; // password used for WiFi when in A
 IPAddress   WifiConfigIp(192, 168, 4, 1); // IP of access point in wifi config mode
 
 const long  gmtOffset_sec = 3600; // UTC Time
-const int   daylightOffset_sec = 0; // UTC Time
+const int   daylightOffset_sec = 3600; // UTC Time
 const int   doorbellOutputPin = 19; // pin connected to the doorbell (when using hardware connection instead of mqtt to ring the bell)
 
 #ifdef CUSTOM_GPIOS
@@ -65,6 +67,9 @@ bool mqttConfigValid = true;
 
 Match lastMatch;
 
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
+
 void addLogMessage(const String& message) {
   // shift all messages in array by 1, oldest message will die
   for (int i=logMessagesCount-1; i>0; i--)
@@ -82,15 +87,8 @@ String getLogMessagesAsHtml() {
 }
 
 String getTimestampString(){
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return "no time";
-  }
   
-  char buffer[25];
-  strftime(buffer,sizeof(buffer),"%Y-%m-%d %H:%M:%S %Z", &timeinfo);
-  String datetime = String(buffer);
+  String datetime = timeClient.getFormattedTime();
   return datetime;
 }
 
@@ -232,6 +230,9 @@ bool initWifi() {
   // Print ESP32 Local IP Address
   Serial.println(WiFi.localIP());
 
+  // Initialize a NTPClient to get time
+  timeClient.begin();
+
   return true;
 }
 
@@ -255,9 +256,6 @@ void startWebserver(){
     Serial.println("An Error has occurred while mounting SPIFFS");
     return;
   }
-
-  // Init time by NTP Client
-  configTime(gmtOffset_sec, daylightOffset_sec, settingsManager.getAppSettings().ntpServer.c_str());
   
   // webserver for normal operating or wifi config?
   if (currentMode == Mode::wificonfig)
@@ -653,8 +651,6 @@ void setup()
     Serial.println("Started normal operating mode");
     currentMode = Mode::scan;
     if (initWifi()) {
-      configTime (gmtOffset_sec, daylightOffset_sec, settingsManager.getAppSettings().ntpServer.c_str());
-      getTimestampString();
       startWebserver();
       if (settingsManager.getAppSettings().mqttServer.isEmpty()) {
         mqttConfigValid = false;
@@ -698,6 +694,7 @@ void loop()
   }
 
   ElegantOTA.loop();
+  timeClient.update();
   
   // Reconnect handling
   if (currentMode != Mode::wificonfig)
