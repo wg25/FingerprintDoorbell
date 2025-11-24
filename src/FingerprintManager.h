@@ -10,7 +10,6 @@
 #define FINGERPRINT_WRITENOTEPAD 0x18 // Write Notepad on sensor
 #define FINGERPRINT_READNOTEPAD 0x19 // Read Notepad from sensor
 
-
 /*
   By using the touch ring as an additional input to the image sensor the sensitivity is much higher for door bell ring events. Unfortunately
   we cannot differ between touches on the ring by fingers or rain drops, so rain on the ring will cause false alarms.

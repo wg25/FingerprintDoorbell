@@ -62,7 +62,6 @@ char msg[50];
 int value = 0;
 bool mqttConfigValid = true;
 
-
 Match lastMatch;
 
 void addLogMessage(const String& message) {
