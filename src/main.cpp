@@ -6,6 +6,7 @@
 #include <DNSServer.h>
 #include <time.h>
 #include <ESPAsyncWebServer.h>
+#include <ElegantOTA.h>
 #include <SPIFFS.h>
 #include <PubSubClient.h>
 #include "FingerprintManager.h"
@@ -14,7 +15,7 @@
 
 enum class Mode { scan, enroll, wificonfig, maintenance };
 
-const char* VersionInfo = "1.0.0";
+const char* VersionInfo = "1.1.0";
 
 // ===================================================================================================================
 // Caution: below are not the credentials for connecting to your home network, they are for the Access Point mode!!!
@@ -436,7 +437,9 @@ void startWebserver(){
     request->send(SPIFFS, "/bootstrap.min.css", "text/css");
   });
 
- 
+  // OTA Update handler
+  ElegantOTA.begin(&webServer);
+
   // Start server
   webServer.begin();
 
@@ -693,6 +696,8 @@ void loop()
   if (shouldReboot) {
     reboot();
   }
+
+  ElegantOTA.loop();
   
   // Reconnect handling
   if (currentMode != Mode::wificonfig)
@@ -714,6 +719,7 @@ void loop()
       }
       mqttClient.loop();
     }
+
   }
 
 
