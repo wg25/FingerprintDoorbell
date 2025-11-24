@@ -1,5 +1,8 @@
 # FingerprintDoorbell
 
+## Changes to frickelzeugs version
+- Code adapted for ESP32-C6
+
 ## What is FingerprintDoorbell?
 It's more or less a doorbell with the ability to scan finger prints or a fingerprint reader with the ability to act as doorbell, depending on your perspective ;-). But lets speak some images:
 
