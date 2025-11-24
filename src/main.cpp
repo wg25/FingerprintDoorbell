@@ -14,7 +14,7 @@
 
 enum class Mode { scan, enroll, wificonfig, maintenance };
 
-const char* VersionInfo = "0.4";
+const char* VersionInfo = "1.0.0";
 
 // ===================================================================================================================
 // Caution: below are not the credentials for connecting to your home network, they are for the Access Point mode!!!
@@ -23,7 +23,7 @@ const char* WifiConfigSsid = "FingerprintDoorbell-Config"; // SSID used for WiFi
 const char* WifiConfigPassword = "12345678"; // password used for WiFi when in Access Point mode for configuration. Min. 8 chars needed!
 IPAddress   WifiConfigIp(192, 168, 4, 1); // IP of access point in wifi config mode
 
-const long  gmtOffset_sec = 0; // UTC Time
+const long  gmtOffset_sec = 3600; // UTC Time
 const int   daylightOffset_sec = 0; // UTC Time
 const int   doorbellOutputPin = 19; // pin connected to the doorbell (when using hardware connection instead of mqtt to ring the bell)
 
@@ -650,6 +650,8 @@ void setup()
     Serial.println("Started normal operating mode");
     currentMode = Mode::scan;
     if (initWifi()) {
+      configTime (gmtOffset_sec, daylightOffset_sec, settingsManager.getAppSettings().ntpServer.c_str());
+      getTimestampString();
       startWebserver();
       if (settingsManager.getAppSettings().mqttServer.isEmpty()) {
         mqttConfigValid = false;
