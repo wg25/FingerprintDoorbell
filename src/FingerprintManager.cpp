@@ -54,7 +54,7 @@ void FingerprintManager::updateTouchState(bool touched)
       // check if sensor or ring is touched
       if (touched) {
         // turn touch indicator on:
-        finger.LEDcontrol(FINGERPRINT_LED_FLASHING, 25, FINGERPRINT_LED_RED, 0);
+        finger.LEDcontrol(FINGERPRINT_LED_FLASHING, 25, FINGERPRINT_LED_BLUE, 0);
       } else {
         // turn touch indicator off:
         setLedRingReady();
@@ -189,7 +189,7 @@ Match FingerprintManager::scanFingerprint() {
     match.returnCode = finger.fingerSearch();
     if (match.returnCode == FINGERPRINT_OK) {
         // found a match!
-        finger.LEDcontrol(FINGERPRINT_LED_ON, 0, FINGERPRINT_LED_PURPLE);
+        finger.LEDcontrol(FINGERPRINT_LED_ON, 0, FINGERPRINT_LED_GREEN);
         
         match.scanResult = ScanResult::matchFound;
         match.matchId = finger.fingerID;
@@ -200,6 +200,7 @@ Match FingerprintManager::scanFingerprint() {
         Serial.println("Communication error");
 
     } else if (match.returnCode == FINGERPRINT_NOTFOUND) {
+        if (scanPass == 5) finger.LEDcontrol(FINGERPRINT_LED_ON, 0, FINGERPRINT_LED_RED);
         Serial.println(String("Did not find a match. (Scan #") + scanPass + String(" of 5)"));
         match.scanResult = ScanResult::noMatchFound;
         if (scanPass < 5) // max 5 Scans until no match found is given back as result

@@ -17,7 +17,7 @@
 
 enum class Mode { scan, enroll, wificonfig, maintenance };
 
-const char* VersionInfo = "1.1.0";
+const char* VersionInfo = "1.2.0";
 
 // ===================================================================================================================
 // Caution: below are not the credentials for connecting to your home network, they are for the Access Point mode!!!
@@ -68,7 +68,7 @@ bool mqttConfigValid = true;
 Match lastMatch;
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+NTPClient timeClient(ntpUDP, "de.pool.ntp.org", gmtOffset_sec, 60000); // update interval 60s
 
 void addLogMessage(const String& message) {
   // shift all messages in array by 1, oldest message will die
@@ -87,7 +87,6 @@ String getLogMessagesAsHtml() {
 }
 
 String getTimestampString(){
-  
   String datetime = timeClient.getFormattedTime();
   return datetime;
 }
@@ -134,8 +133,6 @@ String processor(const String& var){
     return settingsManager.getAppSettings().mqttPassword;
   } else if (var == "MQTT_ROOTTOPIC") {
     return settingsManager.getAppSettings().mqttRootTopic;
-  } else if (var == "NTP_SERVER") {
-    return settingsManager.getAppSettings().ntpServer;
   }
 
   return String();
@@ -356,7 +353,6 @@ void startWebserver(){
         settings.mqttUsername = request->arg("mqtt_username");
         settings.mqttPassword = request->arg("mqtt_password");
         settings.mqttRootTopic = request->arg("mqtt_rootTopic");
-        settings.ntpServer = request->arg("ntpServer");
         settingsManager.saveAppSettings(settings);
         request->redirect("/");  
         shouldReboot = true;
@@ -539,7 +535,7 @@ void doScan()
         Serial.println("no finger");
         mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "off");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
-        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "");
+        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "-1");
         mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), "-1");
       }
       break; 
@@ -564,7 +560,7 @@ void doScan()
         digitalWrite(doorbellOutputPin, HIGH);
         mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "on");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
-        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "");
+        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "-1");
         mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), "-1");
         Serial.println("MQTT message sent: ring the bell!");
         delay(1000);
