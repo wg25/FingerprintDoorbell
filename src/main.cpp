@@ -535,7 +535,7 @@ void doScan()
         Serial.println("no finger");
         mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "off");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
-        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "-1");
+        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "waiting");
         mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), "-1");
       }
       break; 
@@ -560,7 +560,7 @@ void doScan()
         digitalWrite(doorbellOutputPin, HIGH);
         mqttClient.publish((String(mqttRootTopic) + "/ring").c_str(), "on");
         mqttClient.publish((String(mqttRootTopic) + "/matchId").c_str(), "-1");
-        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "-1");
+        mqttClient.publish((String(mqttRootTopic) + "/matchName").c_str(), "waiting");
         mqttClient.publish((String(mqttRootTopic) + "/matchConfidence").c_str(), "-1");
         Serial.println("MQTT message sent: ring the bell!");
         delay(1000);
